@@ -1,4 +1,19 @@
-*.class
+target
+
+# MCP Files #
+mcp
+patchengine/src/main/java/ibxm
+patchengine/src/main/java/net
+patchengine/src/main/java/paulscode
+patchengine/src/main/java/Start.java
+
+# Forge Files #
+patchengine/src/main/java/cpw
+
+# Eclipse Files #
+.classpath
+.project
+*.prefs
 
 # Package Files #
 *.jar

@@ -175,6 +175,7 @@
 								<verbose>false</verbose>
 								<excludes>
 									<exclude>org/**</exclude>
+									<exclude>mcpc/patchengine/patches/**</exclude>
 								</excludes>
 							</resource>
 						</configuration>

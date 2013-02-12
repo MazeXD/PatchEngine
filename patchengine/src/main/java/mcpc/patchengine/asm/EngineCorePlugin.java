@@ -2,14 +2,17 @@ package mcpc.patchengine.asm;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
+
+import com.google.common.io.Files;
+
 import mcpc.patchengine.api.IPatch;
 import mcpc.patchengine.common.Configuration;
-import mcpc.patchengine.patches.ChickenChunksPatch;
-import mcpc.patchengine.patches.IC2Patch;
-import mcpc.patchengine.patches.ICBMPatch;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
@@ -20,7 +23,10 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
     private static boolean _enabled = true;
     private static boolean _debug = false;
 
+    private static PatchClassLoader _classLoader = null;
+
     private static File _configurationFolder = null;
+    private static File _patchFolder = null;
 
     private List<IPatch> _patches = new ArrayList<IPatch>();
 
@@ -43,22 +49,63 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
     @SuppressWarnings("rawtypes")
     public void injectData(Map data) {
         if (data.containsKey("mcLocation")) {
-            _configurationFolder = new File((File) data.get("mcLocation"), "config").getAbsoluteFile();
+            _configurationFolder = new File(new File((File) data.get("mcLocation"), "config"),"PatchEngine").getAbsoluteFile();
+            _patchFolder = new File(_configurationFolder, "patches").getAbsoluteFile();
         }
     }
 
-    private void collectPatches() {
-        // TODO: Search for patches in jar in mods/coremods
+    private void collectPatches(File patchFolder) {
+        for (File file : patchFolder.listFiles()) {
+            if (file.isDirectory()) {
+                continue;
+            }
 
-        _patches.add(new IC2Patch());
-        _patches.add(new ICBMPatch());
-        _patches.add(new ChickenChunksPatch());
+            String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1, file.getName().length());
+
+            if ("class".equals(extension) || "patch".equals(extension) && !file.getName().contains("$")) {
+                loadPatch(file);
+            }
+        }
+
+        // _patches.add(new IC2Patch());
+        // _patches.add(new ICBMPatch());
+        // _patches.add(new ChickenChunksPatch());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadPatch(File patchFile) {
+        if (!patchFile.exists()) {
+            return;
+        }
+
+        Class<?> patchClass;
+        try {
+            patchClass = _classLoader.loadClass(patchFile.getName());
+        } catch (Exception e) {
+            FMLLog.warning("[PatchEngine] Failed to load %s", patchFile.getName());
+            e.printStackTrace();
+            return;
+        }
+
+        if (IPatch.class.isAssignableFrom(patchClass)) {
+            Class<? extends IPatch> patch = (Class<? extends IPatch>) patchClass;
+
+            IPatch instance;
+            try {
+                instance = patch.newInstance();
+            } catch (Exception e) {
+                FMLLog.severe("[PatchEngine] %s doesn't have a constructor without any parameters", patch.getName());
+                return;
+            }
+
+            _patches.add(instance);
+        }
     }
 
     private void loadConfig() {
         _configurationFolder.mkdirs();
 
-        Configuration configuration = new Configuration(new File(_configurationFolder, "PatchEngine.cfg"));
+        Configuration configuration = new Configuration(new File(_configurationFolder, "config.cfg"));
         configuration.load();
 
         _enabled = configuration.get(Configuration.CATEGORY_CORE, "enabled", _enabled, "Should PatchEngine apply patches in general?").getBoolean(_enabled);
@@ -72,7 +119,13 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
     }
 
     public Void call() {
-        collectPatches();
+        if (!_patchFolder.exists()) {
+            _patchFolder.mkdirs();
+        }
+
+        _classLoader = new PatchClassLoader(_patchFolder);
+
+        collectPatches(_patchFolder);
 
         loadConfig();
 
@@ -95,5 +148,47 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
 
     public static boolean isDebug() {
         return _debug;
+    }
+
+    private class PatchClassLoader extends ClassLoader {
+        private File _patchFolder;
+        private Map<String, Class<?>> _cachedClasses;
+
+        public PatchClassLoader(File patchFolder) {
+            super(IPatch.class.getClassLoader());
+
+            _patchFolder = patchFolder;
+            _cachedClasses = new HashMap<String, Class<?>>(10);
+        }
+
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            try {
+                if (_cachedClasses.containsKey(name)) {
+                    return _cachedClasses.get(name);
+                }
+
+                File file = new File(_patchFolder, name);
+                
+                Class<?> cl;
+                if (!file.exists()) {
+                    cl = super.loadClass(name);
+                } else {
+                    byte[] classData = Files.toByteArray(file);
+
+                    ClassReader reader = new ClassReader(classData);
+                    ClassNode node = new ClassNode();
+                    reader.accept(node, 0);
+
+                    cl = defineClass(node.name.replace("/", "."), classData, 0, classData.length);
+                }
+
+                _cachedClasses.put(name, cl);
+
+                return cl;
+            } catch (Exception e) {
+                throw new ClassNotFoundException(e.getMessage(), e);
+            }
+        }
     }
 }
