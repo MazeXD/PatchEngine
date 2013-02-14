@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -15,6 +14,7 @@ import mcpc.patchengine.api.IPatch;
 import mcpc.patchengine.asm.util.ClassUtil;
 import mcpc.patchengine.asm.util.NavigationUtil;
 import mcpc.patchengine.common.Configuration;
+import mcpc.patchengine.common.Constants;
 
 public class ChickenChunksPatch implements IPatch {
     private boolean _enabled = true;
@@ -41,18 +41,18 @@ public class ChickenChunksPatch implements IPatch {
     }
 
     private void patchChunkLoaderManager(ClassNode node) {
-        MethodNode method = ClassUtil.getMethod(node, "cleanChunks", "(Lin;)V");
+        MethodNode method = ClassUtil.getMethod(node, "cleanChunks", String.format("(L%s;)V", Constants.WorldServerClass));
         if (method == null) {
             return;
         }
 
-        LabelNode label = NavigationUtil.getPreviousLabel(method.instructions, method.instructions.size() -1);
+        LabelNode label = NavigationUtil.getPreviousLabel(method.instructions, method.instructions.size() - 1);
         InsnList instructions = new InsnList();
-        
+
         instructions.add(new JumpInsnNode(GOTO, label));
-        
+
         method.instructions.insert(instructions);
 
-        FMLLog.info("[PatchEngine] Disabled ChickenChunks GC");
+        FMLLog.info("[PatchEngine - ChickenChunks] Disabled GC");
     }
 }

@@ -13,6 +13,7 @@ import com.google.common.io.Files;
 
 import mcpc.patchengine.api.IPatch;
 import mcpc.patchengine.common.Configuration;
+import mcpc.patchengine.common.Constants;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
@@ -66,10 +67,6 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
                 loadPatch(file);
             }
         }
-
-        // _patches.add(new IC2Patch());
-        // _patches.add(new ICBMPatch());
-        // _patches.add(new ChickenChunksPatch());
     }
 
     @SuppressWarnings("unchecked")
@@ -123,6 +120,8 @@ public class EngineCorePlugin implements IFMLLoadingPlugin, IFMLCallHook {
             _patchFolder.mkdirs();
         }
 
+        Constants.load(_configurationFolder);
+        
         _classLoader = new PatchClassLoader(_patchFolder);
 
         collectPatches(_patchFolder);

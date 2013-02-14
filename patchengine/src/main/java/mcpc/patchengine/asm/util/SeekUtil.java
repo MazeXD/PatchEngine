@@ -2,6 +2,7 @@ package mcpc.patchengine.asm.util;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.LabelNode;
 
 public class SeekUtil {
     public static int searchInsn(InsnList instructions, AbstractInsnNode node) {
@@ -64,5 +65,47 @@ public class SeekUtil {
         }
 
         return -1;
+    }
+    
+    public static boolean labelHasInsnList(LabelNode node, AbstractInsnNode... instructions)
+    {
+        InsnList insnList = new InsnList();
+        
+        for(AbstractInsnNode insn : instructions)
+        {
+            insnList.add(insn);
+        }
+        
+        return labelHasInsnList(node, insnList);
+    }
+    
+    public static boolean labelHasInsnList(LabelNode node, InsnList instructions)
+    {
+        for(int i = 0; i < instructions.size(); i++)
+        {
+            if(!labelHasInsn(node, instructions.get(i)))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    public static boolean labelHasInsn(LabelNode node, AbstractInsnNode insn)
+    {
+        AbstractInsnNode next = node.getNext();
+        
+        while(next != null && !(next instanceof LabelNode))
+        {
+            if(ComparisionUtil.isEquals(next, insn))
+            {
+                return true;
+            }
+
+            next = next.getNext();
+        }
+        
+        return false;
     }
 }

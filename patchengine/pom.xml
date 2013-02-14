@@ -9,7 +9,7 @@
 
 	<name>patchengine</name>
 	<url></url>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<minecraft.version>1.4.7</minecraft.version>
@@ -167,17 +167,26 @@
 							<goal>copy</goal>
 						</goals>
 						<configuration>
-							<resource>
-								<directory>${basedir}/mcp/reobf/minecraft</directory>
-								<targetPath>${basedir}/target/classes-reobf</targetPath>
-								<preservePath>true</preservePath>
-								<move>true</move>
-								<verbose>false</verbose>
-								<excludes>
-									<exclude>org/**</exclude>
-									<exclude>mcpc/patchengine/patches/**</exclude>
-								</excludes>
-							</resource>
+							<resources>
+								<resource>
+									<directory>${basedir}/mcp/reobf/minecraft</directory>
+									<targetPath>${basedir}/target/classes-reobf</targetPath>
+									<preservePath>true</preservePath>
+									<move>true</move>
+									<verbose>false</verbose>
+									<excludes>
+										<exclude>org/**</exclude>
+										<exclude>mcpc/patchengine/patches/**</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<directory>${basedir}/mcp/reobf/minecraft/mcpc/patchengine/patches/</directory>
+									<targetPath>${basedir}/../patches</targetPath>
+									<preservePath>true</preservePath>
+									<move>true</move>
+									<failIfNotFound>false</failIfNotFound>
+								</resource>
+							</resources>
 						</configuration>
 					</execution>
 				</executions>
@@ -187,7 +196,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
-				    <finalName>PatchEngine-${project.version}</finalName>
+					<finalName>PatchEngine-${project.version}</finalName>
 					<classesDirectory>${basedir}/target/classes-reobf</classesDirectory>
 					<includes>
 						<include>**/mcpc/**</include>

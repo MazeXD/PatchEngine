@@ -19,7 +19,7 @@ import mcpc.patchengine.common.Constants;
 
 public class ICBMPatch implements IPatch {
     private boolean _enabled = true;
-
+    
     @Override
     public String[] getClassNames() {
         return new String[] { "icbm.common.zhapin.ex.ExHuanYuan" };
@@ -40,21 +40,21 @@ public class ICBMPatch implements IPatch {
     }
 
     private void patchExHuanYuan(ClassNode node) {
-        MethodNode method = ClassUtil.getMethod(node, "doBaoZha", "(Lyc;Luniversalelectricity/core/vector/Vector3;Llq;II)Z");
+        MethodNode method = ClassUtil.getMethod(node, "doBaoZha", String.format("(L%s;Luniversalelectricity/core/vector/Vector3;L%s;II)Z", Constants.WorldClass, Constants.EntityClass));
 
         if (method == null) {
             return;
         }
 
-        int index = SeekUtil.searchInsn(method.instructions, new TypeInsnNode(CHECKCAST, "abb"));
+        int index = SeekUtil.searchInsn(method.instructions, new TypeInsnNode(CHECKCAST, Constants.ChunkProviderGenerateClass));
         if (index == -1) {
             return;
         }
 
-        ((TypeInsnNode) method.instructions.get(index)).desc = "org/bukkit/craftbukkit/" + Constants.CraftBukkitNMS + "/generator/NormalChunkGenerator";
-        method.instructions.insert(method.instructions.get(index), new MethodInsnNode(INVOKEVIRTUAL, "org/bukkit/craftbukkit/" + Constants.CraftBukkitNMS + "/generator/NormalChunkGenerator", "getForgeChunkProvider", "()Lzw;"));
+        ((TypeInsnNode) method.instructions.get(index)).desc = String.format("org/bukkit/craftbukkit/%s/generator/NormalChunkGenerator", Constants.CraftBukkitNMS);
+        method.instructions.insert(method.instructions.get(index), new MethodInsnNode(INVOKEVIRTUAL, String.format("org/bukkit/craftbukkit/%s/generator/NormalChunkGenerator", Constants.CraftBukkitNMS), "getForgeChunkProvider", String.format("()L%s;", Constants.ChunkProviderInterface)));
 
-        MethodUtil.getLocalVariable(method, "chunkProviderGenerate", "Labb;").desc = "Lzw;";
+        MethodUtil.getLocalVariable(method, "chunkProviderGenerate", String.format("L%s;", Constants.ChunkProviderGenerateClass)).desc = String.format("L%s;", Constants.ChunkProviderInterface);
 
         for (int i = index + 2; i < method.instructions.size(); i++) {
             AbstractInsnNode insn = method.instructions.get(i);
@@ -62,13 +62,13 @@ public class ICBMPatch implements IPatch {
             if (insn instanceof MethodInsnNode) {
                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
 
-                if (methodInsn.owner.equals("abb")) {
+                if (methodInsn.owner.equals(Constants.ChunkProviderGenerateClass)) {
                     methodInsn.setOpcode(INVOKEINTERFACE);
-                    methodInsn.owner = "zw";
+                    methodInsn.owner = Constants.ChunkProviderInterface;
                 }
             }
         }
 
-        FMLLog.info("[PatchEngine] Patched ExHuanYuan class");
+        FMLLog.info("[PatchEngine - ICBM] Patched ExHuanYuan class");
     }
 }
