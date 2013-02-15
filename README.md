@@ -15,7 +15,17 @@ A Forge coremod for applying patches to mods
 > ##### ICBM [[Thread](http://www.minecraftforum.net/topic/1206144-)] [[Patch](https://github.com/MazeXD/PatchEngine/blob/master/patches/ICBMPatch.class?raw=true)]
 > Fixes issue with Rejuvenation explosives
 
-<br/>
+<br />
+
+> ##### ChickenChunks [[Thread](http://www.minecraftforum.net/topic/909223-)] [[Patch](https://github.com/MazeXD/PatchEngine/blob/master/patches/ChickenChunksPatch.class?raw=true)]
+> Disables its Chunk GC
+>
+> Fixes:
+> - Chunk voids
+> - Disappearing chunks
+> - Chunks regenerating randomly
+
+<br />
 > ##### NotEnoughItems [[Thread](http://www.minecraftforum.net/topic/909223-)] [[Patch](https://github.com/MazeXD/PatchEngine/blob/master/patches/NEIPatch.class?raw=true)]
 > Adds permission nodes to NotEnoughItems
 > - nei.creative
