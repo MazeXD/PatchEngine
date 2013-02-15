@@ -46,7 +46,7 @@ public class ClassUtil {
         for (Object entry : node.fields) {
             FieldNode field = (FieldNode) entry;
 
-            if (field.name.equals(fieldName) && (field.desc.equals("*") || field.desc.equals(desc)) && (field.signature.equals("*") || field.signature.equals(signature))) {
+            if (field.name.equals(fieldName) && (desc.equals("*") || field.desc.equals(desc)) && (signature.equals("*") || field.signature == null || field.signature.equals(signature))) {
                 return field;
             }
         }
