@@ -22,7 +22,7 @@ public class ICBMPatch implements IPatch {
     
     @Override
     public String[] getClassNames() {
-        return new String[] { "icbm.common.zhapin.ex.ExHuanYuan", "icbm.zhapin.zhapin.ex.ExHuanYuan" };
+        return new String[] { "icbm.common.zhapin.ex.ExHuanYuan", "icbm.zhapin.zhapin.ex.ExHuanYuan", "icbm.explosion.zhapin.ex.ExHuanYuan" };
     }
 
     @Override
