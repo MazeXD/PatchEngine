@@ -4,80 +4,23 @@
 
 	<groupId>mcpc</groupId>
 	<artifactId>patchengine</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.2</version>
 	<packaging>jar</packaging>
 
 	<name>patchengine</name>
 	<url></url>
 
+	<parent>
+		<groupId>net.md-5</groupId>
+		<artifactId>ForgeMod</artifactId>
+		<version>1.4.7-6.6.2.534-R2</version>
+	</parent>
+
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<minecraft.version>1.4.7</minecraft.version>
-		<mcp.version>726a</mcp.version>
-		<forge.build>524</forge.build>
-		<forge.version>6.6.1.${forge.build}</forge.version>
+		<mcp.mappings>https://raw.github.com/agaricusb/MinecraftRemapping/c917a6236643690eb3e2e4abff8d25246432b8e1/1.4.7/obf2pkgmcp.srg</mcp.mappings>
+		<forge.suffix>pkgmcp</forge.suffix>
+		<finalname>PatchEngine-${project.version}</finalname>
 	</properties>
-	<repositories>
-		<repository>
-			<id>Dynmap Official</id>
-			<url>http://repo.mikeprimm.com/</url>
-		</repository>
-		<repository>
-			<id>md_5-snapshots</id>
-			<url>http://repo.md-5.net/content/repositories/snapshots/</url>
-		</repository>
-		<repository>
-			<id>cma-repo</id>
-			<url>http://cmastudios.me/repo/maven/</url>
-		</repository>
-	</repositories>
-	<dependencies>
-		<dependency>
-			<groupId>org.minecraftforge</groupId>
-			<artifactId>minecraft_deobfuscated</artifactId>
-			<version>1.4.6-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.asm</groupId>
-			<artifactId>asm-all</artifactId>
-			<version>4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.47</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.argo</groupId>
-			<artifactId>argo</artifactId>
-			<version>2.25</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>12.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl_util</artifactId>
-			<version>2.8.4</version>
-		</dependency>
-		<dependency>
-			<groupId>paulscode</groupId>
-			<artifactId>sound</artifactId>
-			<version>1.1</version>
-		</dependency>
-	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -99,108 +42,14 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<showDeprecation>true</showDeprecation>
-					<compilerArgument>-Xlint:-options</compilerArgument>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<id>reobfuscate-mcp</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${basedir}/mcp/</workingDirectory>
-							<executable>${python}</executable>
-							<arguments>
-								<argument>runtime/reobfuscate.py</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.github.goldin</groupId>
-				<artifactId>copy-maven-plugin</artifactId>
-				<version>0.2.5</version>
-				<executions>
-					<execution>
-						<id>move-classes</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<verbose>false</verbose>
-							<failIfNotFound>false</failIfNotFound>
-							<resources>
-								<resource>
-									<directory>${basedir}/mcp/bin/minecraft</directory>
-									<clean>true</clean>
-									<cleanEmptyDirectories>true</cleanEmptyDirectories>
-								</resource>
-								<resource>
-									<directory>${basedir}/target/classes</directory>
-									<targetPath>${basedir}/mcp/bin/minecraft</targetPath>
-									<includes>
-										<include>**/*.class</include>
-									</includes>
-									<preservePath>true</preservePath>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>move-reobf-classes</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${basedir}/mcp/reobf/minecraft</directory>
-									<targetPath>${basedir}/target/classes-reobf</targetPath>
-									<preservePath>true</preservePath>
-									<move>true</move>
-									<verbose>false</verbose>
-									<excludes>
-										<exclude>org/**</exclude>
-										<exclude>mcpc/patchengine/patches/**</exclude>
-									</excludes>
-								</resource>
-								<resource>
-									<directory>${basedir}/mcp/reobf/minecraft/mcpc/patchengine/patches/</directory>
-									<targetPath>${basedir}/../patches</targetPath>
-									<preservePath>true</preservePath>
-									<move>true</move>
-									<failIfNotFound>false</failIfNotFound>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.1</version>
+				<version>2.4</version>
 				<configuration>
-					<finalName>PatchEngine-${project.version}</finalName>
-					<classesDirectory>${basedir}/target/classes-reobf</classesDirectory>
-					<includes>
-						<include>**/mcpc/**</include>
-					</includes>
+					<finalName>${finalname}</finalName>
+					<classesDirectory>${basedir}/target/classes</classesDirectory>
+					<excludes>
+						<exclude>**/org/**</exclude>
+					</excludes>
 					<archive>
 						<manifestEntries>
 							<Implementation-Title>PatchEngine</Implementation-Title>
@@ -211,11 +60,81 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.github.goldin</groupId>
+				<artifactId>copy-maven-plugin</artifactId>
+				<version>0.2.5</version>
+				<executions>
+					<execution>
+						<id>process-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<verbose>false</verbose>
+							<resources>
+								<!-- Unpack to temp dir -->
+								<resource>
+									<targetPath>${basedir}/target/temp</targetPath>
+									<file>${basedir}/target/${finalname}-remapped.jar</file>
+									<unpack>true</unpack>
+								</resource>
+								<!-- Remove unnecessary jars-->
+								<resource>
+									<directory>${basedir}/target</directory>
+									<includes>
+										<include>*.jar</include>
+									</includes>
+									<clean>true</clean>
+								</resource>
+								<!-- Copy reobfuscated patches -->
+								<resource>
+									<directory>${basedir}/target/temp/mcpc/patchengine/patches</directory>
+									<targetPath>${basedir}/../patches</targetPath>
+									<preservePath>true</preservePath>
+									<failIfNotFound>false</failIfNotFound>
+								</resource>
+								<!-- Remove patches directory -->
+								<resource>
+									<directory>${basedir}/target/temp</directory>
+									<includes>
+										<include>**/mcpc/patchengine/patches/**</include>
+									</includes>
+									<clean>true</clean>
+									<cleanEmptyDirectories>true</cleanEmptyDirectories>
+								</resource>
+								<!-- Package temp -->
+								<resource>
+									<directory>${basedir}/target/temp</directory>
+									<targetPath>${basedir}/target/temp/temp.jar</targetPath>
+									<pack>true</pack>
+								</resource>
+								<!-- Move temp.jar to ${finalname}.jar -->
+								<resource>
+									<file>${basedir}/target/temp/temp.jar</file>
+									<targetPath>${basedir}/target</targetPath>
+									<destFileName>${finalname}.jar</destFileName>
+									<move>true</move>
+								</resource>
+								<!-- Remove temp -->
+								<resource>
+									<directory>${basedir}/target</directory>
+									<includes>
+										<include>**/temp/**</include>
+									</includes>
+									<clean>true</clean>
+									<cleanEmptyDirectories>true</cleanEmptyDirectories>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -223,6 +142,25 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>net.md-5</groupId>
+										<artifactId>
+											specialsource-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0,)
+										</versionRange>
+										<goals>
+											<goal>
+												install-remapped-file
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
@@ -242,44 +180,6 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.github.goldin
-										</groupId>
-										<artifactId>
-											copy-maven-plugin
-										</artifactId>
-										<versionRange>
-											[0.2.5,)
-										</versionRange>
-										<goals>
-											<goal>copy</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											exec-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.2,)
-										</versionRange>
-										<goals>
-											<goal>exec</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -287,132 +187,4 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<profiles>
-		<profile>
-			<id>windows-profile</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<properties>
-				<python>${basedir}/mcp/runtime/bin/python/python_mcp.exe</python>
-			</properties>
-		</profile>
-		<profile>
-			<id>unix-profile</id>
-			<activation>
-				<os>
-					<family>unix</family>
-				</os>
-			</activation>
-			<properties>
-				<python>python</python>
-			</properties>
-		</profile>
-		<profile>
-			<id>mac-profile</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<properties>
-				<python>python</python>
-			</properties>
-		</profile>
-		<profile>
-			<id>prepare-profile</id>
-			<activation>
-				<file>
-					<missing>${basedir}/mcp/LICENSE.txt</missing>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.goldin</groupId>
-						<artifactId>copy-maven-plugin</artifactId>
-						<version>0.2.5</version>
-						<executions>
-							<execution>
-								<id>download-dependencies</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<resource>
-											<targetPath>${basedir}/mcp</targetPath>
-											<directory>http://mcp.ocean-labs.de/files/archive/mcp${mcp.version}.zip</directory>
-											<unpack>true</unpack>
-										</resource>
-										<resource>
-											<targetPath>${basedir}/mcp</targetPath>
-											<directory>http://files.minecraftforge.net/minecraftforge/minecraftforge-src-${minecraft.version}-${forge.version}.zip</directory>
-											<unpack>true</unpack>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-							<execution>
-								<id>move-mcp-source</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<verbose>false</verbose>
-									<resources>
-										<resource>
-											<directory>${basedir}/src/main/java</directory>
-											<targetPath>${basedir}/temp</targetPath>
-											<preservePath>true</preservePath>
-										</resource>
-										<resource>
-											<directory>${basedir}/mcp/src/minecraft</directory>
-											<targetPath>${basedir}/src/main/java</targetPath>
-											<preservePath>true</preservePath>
-										</resource>
-										<resource>
-											<directory>${basedir}/temp</directory>
-											<targetPath>${basedir}/src/main/java</targetPath>
-											<preservePath>true</preservePath>
-										</resource>
-										<resource>
-											<directory>${basedir}/temp</directory>
-											<clean>true</clean>
-											<cleanEmptyDirectories>true</cleanEmptyDirectories>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.2</version>
-						<executions>
-							<execution>
-								<id>install-forge</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<workingDirectory>${basedir}/mcp/forge/</workingDirectory>
-									<executable>${python}</executable>
-									<arguments>
-										<argument>install.py</argument>
-									</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
