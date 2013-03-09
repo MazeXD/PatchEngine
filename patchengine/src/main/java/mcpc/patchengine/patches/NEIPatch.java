@@ -2,8 +2,6 @@ package mcpc.patchengine.patches;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import net.minecraft.server.MinecraftServer;
-
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -21,13 +19,11 @@ import cpw.mods.fml.common.FMLLog;
 import mcpc.patchengine.api.IPatch;
 import mcpc.patchengine.asm.util.ClassUtil;
 import mcpc.patchengine.asm.util.MethodUtil;
-import mcpc.patchengine.asm.util.SeekUtil;
 import mcpc.patchengine.common.Configuration;
 import mcpc.patchengine.common.Constants;
 
 public class NEIPatch implements IPatch{
     private boolean _enabled = true;
-    public static MinecraftServer server = null;
     
     @Override
     public String[] getClassNames() {
