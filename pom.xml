@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>mcpc</groupId>
-	<artifactId>patchengine</artifactId>
+	<artifactId>PatchEngine</artifactId>
 	<version>0.2</version>
 	<packaging>jar</packaging>
 
-	<name>patchengine</name>
+	<name>PatchEngine</name>
 	<url></url>
 
 	<parent>
@@ -45,7 +45,6 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
-					<finalName>${finalname}</finalName>
 					<classesDirectory>${basedir}/target/classes</classesDirectory>
 					<excludes>
 						<exclude>**/org/**</exclude>
@@ -77,16 +76,8 @@
 								<!-- Unpack to temp dir -->
 								<resource>
 									<targetPath>${basedir}/target/temp</targetPath>
-									<file>${basedir}/target/${finalname}-remapped.jar</file>
+									<file>${basedir}/target/${project.artifactId}-${project.version}-remapped.jar</file>
 									<unpack>true</unpack>
-								</resource>
-								<!-- Remove unnecessary jars-->
-								<resource>
-									<directory>${basedir}/target</directory>
-									<includes>
-										<include>*.jar</include>
-									</includes>
-									<clean>true</clean>
 								</resource>
 								<!-- Copy reobfuscated patches -->
 								<resource>
@@ -104,27 +95,17 @@
 									<clean>true</clean>
 									<cleanEmptyDirectories>true</cleanEmptyDirectories>
 								</resource>
-								<!-- Package temp -->
+								<!-- Package temp directory -->
 								<resource>
 									<directory>${basedir}/target/temp</directory>
-									<targetPath>${basedir}/target/temp/temp.jar</targetPath>
+									<targetPath>${basedir}/target/temp/${project.artifactId}-${project.version}.jar</targetPath>
 									<pack>true</pack>
 								</resource>
-								<!-- Move temp.jar to ${finalname}.jar -->
+								<!-- Copy packaged jar to "${project.artifactId}-${project.version}.jar" -->
 								<resource>
-									<file>${basedir}/target/temp/temp.jar</file>
+									<file>${basedir}/target/temp/${project.artifactId}-${project.version}.jar</file>
 									<targetPath>${basedir}/target</targetPath>
-									<destFileName>${finalname}.jar</destFileName>
-									<move>true</move>
-								</resource>
-								<!-- Remove temp -->
-								<resource>
-									<directory>${basedir}/target</directory>
-									<includes>
-										<include>**/temp/**</include>
-									</includes>
-									<clean>true</clean>
-									<cleanEmptyDirectories>true</cleanEmptyDirectories>
+									<verbose>true</verbose>
 								</resource>
 							</resources>
 						</configuration>
