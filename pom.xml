@@ -91,7 +91,7 @@
 								<!-- Copy reobfuscated patches -->
 								<resource>
 									<directory>${basedir}/target/temp/mcpc/patchengine/patches</directory>
-									<targetPath>${basedir}/../patches</targetPath>
+									<targetPath>${basedir}/patches</targetPath>
 									<preservePath>true</preservePath>
 									<failIfNotFound>false</failIfNotFound>
 								</resource>
