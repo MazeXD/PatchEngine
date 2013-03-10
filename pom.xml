@@ -76,7 +76,7 @@
 								<!-- Unpack to temp dir -->
 								<resource>
 									<targetPath>${basedir}/target/temp</targetPath>
-									<file>${basedir}/target/${project.artifactId}-${project.version}-remapped.jar</file>
+									<file>${basedir}/target/${project.artifactId}-${project.version}.jar</file>
 									<unpack>true</unpack>
 								</resource>
 								<!-- Copy reobfuscated patches -->
